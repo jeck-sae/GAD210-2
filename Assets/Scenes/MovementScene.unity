@@ -369,11 +369,17 @@ MonoBehaviour:
   boostSpeed: 5
   boostDuration: 1
   boostCooldown: 3
-  currentSpeed: 0
+  bounceForce: 125
+  stunDuration: 0.5
+  bounceForceWhileBoosting: 175
+  stunDurationWhileBoosting: 1
+  bounceYmultiplier: 0.1
+  bounceYadd: 0.5
   sensitivity: 0.5
   boostSensitivityMultiplier: 0.1
   cameraParent: {fileID: 1492323252}
   sting: {fileID: 863444693}
+  currentSpeed: 0
 --- !u!4 &299698436
 Transform:
   m_ObjectHideFlags: 0
@@ -740,7 +746,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &863444694
 Transform:
   m_ObjectHideFlags: 0
