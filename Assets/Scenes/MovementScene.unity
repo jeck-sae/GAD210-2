@@ -379,7 +379,7 @@ MonoBehaviour:
   sensitivity: 0.5
   boostSensitivityMultiplier: 0.1
   cameraParent: {fileID: 1492323252}
-  sting: {fileID: 863444693}
+  stinger: {fileID: 863444693}
   currentSpeed: 0
 --- !u!4 &299698436
 Transform:
@@ -742,7 +742,7 @@ GameObject:
   m_Component:
   - component: {fileID: 863444694}
   m_Layer: 0
-  m_Name: Sting
+  m_Name: Stinger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

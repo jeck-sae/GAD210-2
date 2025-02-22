@@ -25,7 +25,7 @@ public class MosquitoMovement : MonoBehaviour
     [SerializeField] float boostSensitivityMultiplier = 0.2f;
     
     [SerializeField] GameObject cameraParent;
-    [SerializeField] GameObject sting;    
+    [SerializeField] GameObject stinger;    
     Rigidbody rb;
 
     [SerializeField, DisableInEditorMode] float currentSpeed;
@@ -42,54 +42,58 @@ public class MosquitoMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //handle movement
         if(!stunned)
             rb.linearVelocity = cameraParent.transform.forward * currentSpeed;
-
     }
 
 
     private void Update()
     {
+        //boost if pressing space and in the right conditions
         if(Input.GetKeyDown(KeyCode.Space) && !boostOnCooldown && !stunned)
             StartCoroutine(Boost());
 
-
+        //rotate camera
         float currentSensitivity = sensitivity * (boosting ? boostSensitivityMultiplier : 1);
-
         cameraParent.transform.rotation *= Quaternion.Euler(new Vector3(-Input.mousePositionDelta.y * currentSensitivity, 0));
         transform.rotation *= Quaternion.Euler(new Vector3(0, Input.mousePositionDelta.x * currentSensitivity));
-        
     }
 
 
     IEnumerator Boost()
     {
+        //increase speed and enable stinger
         boostOnCooldown = true;
         boosting = true;
-        sting.gameObject.SetActive(true);
+        stinger.gameObject.SetActive(true);
         currentSpeed = boostSpeed;
         
         yield return new WaitForSeconds(boostDuration);
-        
+
+        //reset speed and disable stinger
         boosting = false;
-        sting.gameObject.SetActive(false);
+        stinger.gameObject.SetActive(false);
         currentSpeed = baseSpeed;
         
         yield return new WaitForSeconds(boostCooldown);
-        
+
+        //allow boosting again
         boostOnCooldown = false;
     }
 
 
     private void OnCollisionEnter(Collision collision)
     {
-        //if(stung) return;
+        //if pressing E, act as if you hit a stingable target
+        //(for debugging, will implement targeting system later)
         if (!stunned && boosting && Input.GetKey(KeyCode.E))
         {
             StartCoroutine(Sting());
             return;
         }
 
+        //if not stinging, bounce away
         BounceAndStun(collision.contacts[0].point);
     }
 
@@ -97,12 +101,11 @@ public class MosquitoMovement : MonoBehaviour
 
     void BounceAndStun(Vector3 collisionPoint)
     {
-        stunned = true;
-        boosting = false;
-
+        //stun lasts longer if boosting
         float duration = boosting ? stunDurationWhileBoosting : stunDuration;
         StartCoroutine(Stun(duration));
 
+        //bounce away from collision point
         var collisionDirection = transform.position - collisionPoint;
         collisionDirection.y = (collisionDirection.y * bounceYmultiplier);
         collisionDirection = collisionDirection.normalized + Vector3.up * bounceYadd;
@@ -114,7 +117,9 @@ public class MosquitoMovement : MonoBehaviour
 
     IEnumerator Sting()
     {
-        Debug.Log("stinging");
+        Debug.Log("Stinging");
+
+        //freeze movement for a bit
         var before = rb.constraints;
         rb.constraints = RigidbodyConstraints.FreezeAll;
         yield return new WaitForSeconds(stingDuration);
@@ -123,14 +128,18 @@ public class MosquitoMovement : MonoBehaviour
 
     IEnumerator Stun(float duration)
     {
+        //stop movement and enable gravity
+        boosting = false;
+        stunned = true;
         rb.useGravity = true;
 
         yield return new WaitForSeconds(duration);
-        
-        currentSpeed = baseSpeed;
+
+        //resetting speed in case it was boosting
+        //and the effect was still active
+        currentSpeed = baseSpeed; 
         rb.useGravity = false;
         stunned = false;
-
     }
 
 }
