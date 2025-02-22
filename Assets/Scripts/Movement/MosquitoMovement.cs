@@ -33,11 +33,14 @@ public class MosquitoMovement : MonoBehaviour
     private bool boostOnCooldown;
     private bool stunned;
 
+    private float cameraRotationX;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
         currentSpeed = baseSpeed;
+        StartCoroutine(FixStartRotation());
     }
 
     private void FixedUpdate()
@@ -54,12 +57,27 @@ public class MosquitoMovement : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Space) && !boostOnCooldown && !stunned)
             StartCoroutine(Boost());
 
-        //rotate camera
+        //reduce camera sensitivity while boosting
         float currentSensitivity = sensitivity * (boosting ? boostSensitivityMultiplier : 1);
-        cameraParent.transform.rotation *= Quaternion.Euler(new Vector3(-Input.mousePositionDelta.y * currentSensitivity, 0));
+
+        //clamp the X rotation of the camera (to avoid getting upside down)
+        cameraRotationX -= Input.mousePositionDelta.y * currentSensitivity;
+        cameraRotationX = Mathf.Clamp(cameraRotationX, -90, 90);
+        cameraParent.transform.localEulerAngles = Vector3.right * cameraRotationX;
+
+        //rotate camera Y
         transform.rotation *= Quaternion.Euler(new Vector3(0, Input.mousePositionDelta.x * currentSensitivity));
     }
 
+
+    IEnumerator FixStartRotation()
+    {
+        //resets camera rotation after 2 frames
+        //because the game would start facing down
+        yield return null;
+        yield return null;
+        cameraRotationX = 0;
+    }
 
     IEnumerator Boost()
     {
