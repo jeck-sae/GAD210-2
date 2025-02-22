@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class MosquitoMovement : MonoBehaviour
@@ -18,6 +19,7 @@ public class MosquitoMovement : MonoBehaviour
 
     [SerializeField] float bounceYmultiplier = .1f;
     [SerializeField] float bounceYadd = 1;
+    [SerializeField] float stingDuration = 1;
 
     [SerializeField] float sensitivity = 1;
     [SerializeField] float boostSensitivityMultiplier = 0.2f;
@@ -82,20 +84,41 @@ public class MosquitoMovement : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         //if(stung) return;
-        if (!stunned)
+        if (!stunned && boosting && Input.GetKey(KeyCode.E))
         {
-            stunned = true;
-            float duration = boosting ? stunDurationWhileBoosting : stunDuration;
-            StartCoroutine(Stun(duration));
-
-            var collisionDirection = transform.position - collision.contacts[0].point;
-            collisionDirection.y = (collisionDirection.y * bounceYmultiplier);
-            collisionDirection = collisionDirection.normalized + Vector3.up * bounceYadd;
-
-            rb.angularVelocity = Vector3.zero;
-            rb.AddForce(collisionDirection.normalized * bounceForce);
+            StartCoroutine(Sting());
+            return;
         }
 
+        BounceAndStun(collision.contacts[0].point);
+    }
+
+
+
+    void BounceAndStun(Vector3 collisionPoint)
+    {
+        stunned = true;
+        boosting = false;
+
+        float duration = boosting ? stunDurationWhileBoosting : stunDuration;
+        StartCoroutine(Stun(duration));
+
+        var collisionDirection = transform.position - collisionPoint;
+        collisionDirection.y = (collisionDirection.y * bounceYmultiplier);
+        collisionDirection = collisionDirection.normalized + Vector3.up * bounceYadd;
+
+        rb.angularVelocity = Vector3.zero;
+        rb.AddForce(collisionDirection.normalized * bounceForce);
+
+    }
+
+    IEnumerator Sting()
+    {
+        Debug.Log("stinging");
+        var before = rb.constraints;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
+        yield return new WaitForSeconds(stingDuration);
+        rb.constraints = before;
     }
 
     IEnumerator Stun(float duration)
