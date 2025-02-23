@@ -41,6 +41,7 @@ public class MosquitoMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         currentSpeed = baseSpeed;
         StartCoroutine(FixStartRotation());
+        GetComponentInChildren<TargetDetection>(true).OnTargetDetected += OnTargetDetected;
     }
 
     private void FixedUpdate()
@@ -49,7 +50,6 @@ public class MosquitoMovement : MonoBehaviour
         if(!stunned)
             rb.linearVelocity = cameraParent.transform.forward * currentSpeed;
     }
-
 
     private void Update()
     {
@@ -69,6 +69,10 @@ public class MosquitoMovement : MonoBehaviour
         transform.rotation *= Quaternion.Euler(new Vector3(0, Input.mousePositionDelta.x * currentSensitivity));
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        BounceAndStun(collision.contacts[0].point);
+    }
 
     IEnumerator FixStartRotation()
     {
@@ -100,27 +104,11 @@ public class MosquitoMovement : MonoBehaviour
         boostOnCooldown = false;
     }
 
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        //if pressing E, act as if you hit a stingable target
-        //(for debugging, will implement targeting system later)
-        if (!stunned && boosting && Input.GetKey(KeyCode.E))
-        {
-            StartCoroutine(Sting());
-            return;
-        }
-
-        //if not stinging, bounce away
-        BounceAndStun(collision.contacts[0].point);
-    }
-
-
-
     void BounceAndStun(Vector3 collisionPoint)
     {
         //stun lasts longer if boosting
         float duration = boosting ? stunDurationWhileBoosting : stunDuration;
+        float force = boosting ? bounceForceWhileBoosting : bounceForce;
         StartCoroutine(Stun(duration));
 
         //bounce away from collision point
@@ -128,20 +116,8 @@ public class MosquitoMovement : MonoBehaviour
         collisionDirection.y = (collisionDirection.y * bounceYmultiplier);
         collisionDirection = collisionDirection.normalized + Vector3.up * bounceYadd;
 
-        rb.angularVelocity = Vector3.zero;
-        rb.AddForce(collisionDirection.normalized * bounceForce);
-
-    }
-
-    IEnumerator Sting()
-    {
-        Debug.Log("Stinging");
-
-        //freeze movement for a bit
-        var before = rb.constraints;
-        rb.constraints = RigidbodyConstraints.FreezeAll;
-        yield return new WaitForSeconds(stingDuration);
-        rb.constraints = before;
+        rb.linearVelocity = Vector3.zero;
+        rb.AddForce(collisionDirection.normalized * force);
     }
 
     IEnumerator Stun(float duration)
@@ -158,6 +134,20 @@ public class MosquitoMovement : MonoBehaviour
         currentSpeed = baseSpeed; 
         rb.useGravity = false;
         stunned = false;
+    }
+
+    private void OnTargetDetected()
+    {
+        StartCoroutine(Sting());
+    }
+
+    IEnumerator Sting()
+    {
+        //freeze movement for a bit
+        var before = rb.constraints;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
+        yield return new WaitForSeconds(stingDuration);
+        rb.constraints = before;
     }
 
 }

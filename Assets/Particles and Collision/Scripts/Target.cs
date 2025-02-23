@@ -19,7 +19,6 @@ public class Target : MonoBehaviour
     {
 
         box = GetComponent<BoxCollider>();
-        box.isTrigger = true;
 
 
         objectName = targetData.targetName;

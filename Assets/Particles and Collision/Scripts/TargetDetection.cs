@@ -1,10 +1,11 @@
 using UnityEngine;
 using System.IO;
+using System;
 
 public class TargetDetection : MonoBehaviour
 {
-    
-   
+    public Action OnTargetDetected;
+
     private void OnTriggerEnter(Collider other)
     {
         Target target = other.GetComponent<Target>();
@@ -22,6 +23,8 @@ public class TargetDetection : MonoBehaviour
 
                
                 target.MarkAsStrung();
+
+                OnTargetDetected?.Invoke();
 
                 Renderer targetRenderer = other.GetComponent<Renderer>();
 
