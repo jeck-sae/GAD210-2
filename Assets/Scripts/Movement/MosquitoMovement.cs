@@ -12,6 +12,14 @@ public class MosquitoMovement : MonoBehaviour
     [SerializeField] float boostDuration = 3;
     [SerializeField] float boostCooldown = 3;
 
+    [SerializeField] Camera mainCamera;
+    [SerializeField] float boostFOV = 90; // Increased FOV during boost
+    [SerializeField] float normalFOV = 60; // Default FOV
+    [SerializeField] float fovLerpSpeed = 5f; // How fast FOV transitions
+
+    [SerializeField] float cameraShakeIntensity = 0.1f;
+    [SerializeField] float cameraShakeDuration = 0.2f; 
+
     [SerializeField] float bounceForce = 100;
     [SerializeField] float stunDuration = 0.35f;
     [SerializeField] float bounceForceWhileBoosting = 100;
@@ -42,6 +50,11 @@ public class MosquitoMovement : MonoBehaviour
         currentSpeed = baseSpeed;
         StartCoroutine(FixStartRotation());
         GetComponentInChildren<TargetDetection>(true).OnTargetDetected += OnTargetDetected;
+
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+        } 
     }
 
     private void FixedUpdate()
@@ -90,20 +103,58 @@ public class MosquitoMovement : MonoBehaviour
         boosting = true;
         stinger.gameObject.SetActive(true);
         currentSpeed = boostSpeed;
-        
+
+        StartCoroutine(ChangeFOV(boostFOV));
+
+        StartCoroutine(CameraShake(cameraShakeDuration, cameraShakeIntensity)); 
+
         yield return new WaitForSeconds(boostDuration);
 
         //reset speed and disable stinger
         boosting = false;
         stinger.gameObject.SetActive(false);
         currentSpeed = baseSpeed;
-        
+
+        StartCoroutine(ChangeFOV(normalFOV)); 
+
         yield return new WaitForSeconds(boostCooldown);
 
         //allow boosting again
         boostOnCooldown = false;
     }
 
+    IEnumerator ChangeFOV(float targetFOV)
+    {
+        float startFOV = mainCamera.fieldOfView;
+        float time = 0;
+
+        while (time < 1f)
+        {
+            mainCamera.fieldOfView = Mathf.Lerp(startFOV, targetFOV, time);
+            time += Time.deltaTime * fovLerpSpeed;
+            yield return null;
+        }
+
+        mainCamera.fieldOfView = targetFOV;
+    }
+
+    IEnumerator CameraShake(float duration, float intensity)
+    {
+        Vector3 originalPosition = mainCamera.transform.localPosition;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float x = Random.Range(-intensity, intensity);
+            float y = Random.Range(-intensity, intensity);
+            mainCamera.transform.localPosition = originalPosition + new Vector3(x, y, 0);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        mainCamera.transform.localPosition = originalPosition;
+    } 
     void BounceAndStun(Vector3 collisionPoint)
     {
         //stun lasts longer if boosting
