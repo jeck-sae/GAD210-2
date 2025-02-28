@@ -8,32 +8,33 @@ public class MosquitoMovement : MonoBehaviour
 {
 
     [SerializeField] float baseSpeed = 10;
-    [SerializeField] float boostSpeed = 30;
-    [SerializeField] float boostDuration = 3;
-    [SerializeField] float boostCooldown = 3;
-
-    [SerializeField] Camera mainCamera;
-    [SerializeField] float boostFOV = 90; // Increased FOV during boost
-    [SerializeField] float normalFOV = 60; // Default FOV
-    [SerializeField] float fovLerpSpeed = 5f; // How fast FOV transitions
-
-    [SerializeField] float cameraShakeIntensity = 0.1f;
-    [SerializeField] float cameraShakeDuration = 0.2f; 
-
-    [SerializeField] float bounceForce = 100;
-    [SerializeField] float stunDuration = 0.35f;
-    [SerializeField] float bounceForceWhileBoosting = 100;
-    [SerializeField] float stunDurationWhileBoosting = 1f;
-
-    [SerializeField] float bounceYmultiplier = .1f;
-    [SerializeField] float bounceYadd = 1;
     [SerializeField] float stingDuration = 1;
 
-    [SerializeField] float sensitivity = 1;
-    [SerializeField] float boostSensitivityMultiplier = 0.2f;
+    [SerializeField, FoldoutGroup("BoostInfo")] float boostSpeed = 30;
+    [SerializeField, FoldoutGroup("BoostInfo")] float boostDuration = 3;
+    [SerializeField, FoldoutGroup("BoostInfo")] float boostCooldown = 3;
+
+    [SerializeField, FoldoutGroup("BoostInfo")] float boostFOV = 90; // Increased FOV during boost
+    [SerializeField, FoldoutGroup("BoostInfo")] float normalFOV = 60; // Default FOV
+    [SerializeField, FoldoutGroup("BoostInfo")] float fovLerpSpeed = 5f; // How fast FOV transitions
+
+    [SerializeField, FoldoutGroup("BoostInfo")] float cameraShakeIntensity = 0.1f;
+    [SerializeField, FoldoutGroup("BoostInfo")] float cameraShakeDuration = 0.2f; 
+
+    [SerializeField, FoldoutGroup("BounceInfo")] float bounceForce = 100;
+    [SerializeField, FoldoutGroup("BounceInfo")] float stunDuration = 0.35f;
+    [SerializeField, FoldoutGroup("BounceInfo")] float bounceForceWhileBoosting = 100;
+    [SerializeField, FoldoutGroup("BounceInfo")] float stunDurationWhileBoosting = 1f;
+
+    [SerializeField, FoldoutGroup("BounceInfo")] float bounceYmultiplier = .1f;
+    [SerializeField, FoldoutGroup("BounceInfo")] float bounceYadd = 1;
+
+    [SerializeField, FoldoutGroup("Other")] float sensitivity = 1;
+    [SerializeField, FoldoutGroup("Other")] float boostSensitivityMultiplier = 0.2f;
     
-    [SerializeField] GameObject cameraParent;
-    [SerializeField] GameObject stinger;    
+    [SerializeField, FoldoutGroup("Other")] Camera mainCamera;
+    [SerializeField, FoldoutGroup("Other")] GameObject cameraParent;
+    [SerializeField, FoldoutGroup("Other")] GameObject stinger;    
     Rigidbody rb;
 
     [SerializeField, DisableInEditorMode] float currentSpeed;
@@ -104,9 +105,8 @@ public class MosquitoMovement : MonoBehaviour
         stinger.gameObject.SetActive(true);
         currentSpeed = boostSpeed;
 
-        StartCoroutine(ChangeFOV(boostFOV));
-
-        StartCoroutine(CameraShake(cameraShakeDuration, cameraShakeIntensity)); 
+        CameraEffects.Instance.ChangeFOV(boostFOV, fovLerpSpeed); 
+        CameraEffects.Instance.Shake(boostDuration, cameraShakeIntensity); 
 
         yield return new WaitForSeconds(boostDuration);
 
@@ -115,7 +115,7 @@ public class MosquitoMovement : MonoBehaviour
         stinger.gameObject.SetActive(false);
         currentSpeed = baseSpeed;
 
-        StartCoroutine(ChangeFOV(normalFOV)); 
+        CameraEffects.Instance.ChangeFOV(normalFOV, fovLerpSpeed); 
 
         yield return new WaitForSeconds(boostCooldown);
 
@@ -123,38 +123,8 @@ public class MosquitoMovement : MonoBehaviour
         boostOnCooldown = false;
     }
 
-    IEnumerator ChangeFOV(float targetFOV)
-    {
-        float startFOV = mainCamera.fieldOfView;
-        float time = 0;
+    
 
-        while (time < 1f)
-        {
-            mainCamera.fieldOfView = Mathf.Lerp(startFOV, targetFOV, time);
-            time += Time.deltaTime * fovLerpSpeed;
-            yield return null;
-        }
-
-        mainCamera.fieldOfView = targetFOV;
-    }
-
-    IEnumerator CameraShake(float duration, float intensity)
-    {
-        Vector3 originalPosition = mainCamera.transform.localPosition;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            float x = Random.Range(-intensity, intensity);
-            float y = Random.Range(-intensity, intensity);
-            mainCamera.transform.localPosition = originalPosition + new Vector3(x, y, 0);
-
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        mainCamera.transform.localPosition = originalPosition;
-    } 
     void BounceAndStun(Vector3 collisionPoint)
     {
         //stun lasts longer if boosting
@@ -177,6 +147,8 @@ public class MosquitoMovement : MonoBehaviour
         boosting = false;
         stunned = true;
         rb.useGravity = true;
+
+        CameraEffects.Instance.Shake(cameraShakeDuration, cameraShakeIntensity);
 
         yield return new WaitForSeconds(duration);
 
