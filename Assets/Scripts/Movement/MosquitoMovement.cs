@@ -1,4 +1,5 @@
 using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -43,6 +44,9 @@ public class MosquitoMovement : MonoBehaviour
     private bool stunned;
 
     private float cameraRotationX;
+
+
+    public Action<float, float> OnBoostStart;
 
     private void Awake()
     {
@@ -99,6 +103,8 @@ public class MosquitoMovement : MonoBehaviour
 
     IEnumerator Boost()
     {
+        OnBoostStart?.Invoke(boostDuration, boostCooldown);
+
         //increase speed and enable stinger
         boostOnCooldown = true;
         boosting = true;
