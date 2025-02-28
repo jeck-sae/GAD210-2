@@ -62,7 +62,7 @@ public class MosquitoMovement : MonoBehaviour
     {
         //handle movement
         if(!stunned)
-            rb.linearVelocity = cameraParent.transform.forward * currentSpeed;
+            rb.linearVelocity = mainCamera.transform.forward * currentSpeed;
     }
 
     private void Update()
