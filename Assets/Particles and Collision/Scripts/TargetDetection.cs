@@ -26,12 +26,15 @@ public class TargetDetection : MonoBehaviour
 
                 OnTargetDetected?.Invoke();
 
-                Renderer targetRenderer = other.GetComponent<Renderer>();
+                Renderer renderer = GetComponent<Renderer>();
 
-                if (targetRenderer != null)
+                Material objectMaterial = renderer.material;
+
+                if (renderer != null)
                 {
-                    targetRenderer.material.color = Color.white;
-                   
+                    objectMaterial.SetFloat("Temperature", 100f);
+                    Debug.Log("color changed");
+
                 }
 
                 Debug.Log("target has already been stung" + gameObject.name);

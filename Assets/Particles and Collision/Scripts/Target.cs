@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[RequireComponent(typeof(BoxCollider))]
 
 public class Target : MonoBehaviour
 {
@@ -13,21 +12,23 @@ public class Target : MonoBehaviour
 
     private bool canBeStung = true;
 
-    private BoxCollider box;
 
     public void Start()
     {
-
-        box = GetComponent<BoxCollider>();
 
 
         objectName = targetData.targetName;
         objectScore = targetData.targetScore;
 
-        objectColor = GetComponent<Renderer>();
-        objectColor.material.color = targetData.targetColor;
-      
 
+
+
+
+        Renderer renderer = GetComponent<Renderer>();
+
+        Material objectMaterial = renderer.material;
+
+        objectMaterial.SetFloat("Temperature", 100f);
     }
 
     
