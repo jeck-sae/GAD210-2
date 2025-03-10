@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 773a21d9427d6493f86e642785ec5139, type: 3}
-  m_Name: Target Bllue
+  m_Name: Target Blue
   m_EditorClassIdentifier: 
   targetName: Blue
-  targetScore: 0
-  targetColor: {r: 0, g: 0.19680643, b: 1, a: 0}
+  targetScore: 50
+  hitMaterial: {fileID: 2100000, guid: 3b12150b3e1a6994fb53d012674fe4e7, type: 2}

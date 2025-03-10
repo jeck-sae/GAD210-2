@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Thermal Blue
-  m_Shader: {fileID: -6465566751694194690, guid: e04485653988244ba879346cfa4c0e36, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: db6390f8a595040418f068008ad87df3, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -40,7 +40,7 @@ Material:
     m_Floats:
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Temperature: 25.6
+    - _Temperature: 225.7
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

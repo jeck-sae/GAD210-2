@@ -10,7 +10,8 @@ public class TargetData : ScriptableObject
 {
     public string targetName;
     public int targetScore;
-    public Color targetColor;
+    public Material hitMaterial;
+                            
     
 
 

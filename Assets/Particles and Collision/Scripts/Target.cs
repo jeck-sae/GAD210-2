@@ -7,8 +7,9 @@ public class Target : MonoBehaviour
 
     private string objectName;
     private int objectScore;
-    private Renderer objectColor;
+    private Material targetMaterial;
     [SerializeField] ParticleSystem stingEffect;
+    MeshRenderer meshRenderer;
 
     private bool canBeStung = true;
 
@@ -16,19 +17,10 @@ public class Target : MonoBehaviour
     public void Start()
     {
 
-
         objectName = targetData.targetName;
         objectScore = targetData.targetScore;
+       
 
-
-
-
-
-        Renderer renderer = GetComponent<Renderer>();
-
-        Material objectMaterial = renderer.material;
-
-        objectMaterial.SetFloat("Temperature", 100f);
     }
 
     
@@ -44,9 +36,18 @@ public class Target : MonoBehaviour
 
         stingEffect.Play();
 
+        ChangeMaterial();
+
         canBeStung = false;
 
-        
+    }
 
+    public void ChangeMaterial()
+    {
+        meshRenderer = GetComponent<MeshRenderer>();
+        targetMaterial = targetData.hitMaterial;
+        targetData.hitMaterial.mainTextureScale = targetMaterial.mainTextureScale;
+
+        meshRenderer.material.SetFloat("_Temperature", 95f);
     }
 }

@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetName: Red
   targetScore: 100
-  targetColor: {r: 0.9339623, g: 0.16537505, b: 0.101326115, a: 0}
+  hitMaterial: {fileID: 2100000, guid: 3b12150b3e1a6994fb53d012674fe4e7, type: 2}
