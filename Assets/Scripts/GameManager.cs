@@ -14,13 +14,13 @@ public class GameManager : Singleton<GameManager>
 
     public void GoodEnding()
     {
-        badEnding.SetActive(true);
+        goodEnding.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
         FindAnyObjectByType<MosquitoMovement>().enabled = false;
     }
     public void BadEnding()
     {
-        goodEnding.SetActive(true);
+        badEnding.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
         FindAnyObjectByType<MosquitoMovement>().enabled = false;
     }
