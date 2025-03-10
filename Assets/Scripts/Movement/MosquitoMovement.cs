@@ -51,7 +51,6 @@ public class MosquitoMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        Cursor.lockState = CursorLockMode.Locked;
         currentSpeed = baseSpeed;
         StartCoroutine(FixStartRotation());
         GetComponentInChildren<TargetDetection>(true).OnTargetDetected += OnTargetDetected;
@@ -71,6 +70,7 @@ public class MosquitoMovement : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.T)) Debug.Log(Time.timeScale);
         //boost if pressing space and in the right conditions
         if(Input.GetKeyDown(KeyCode.Space) && !boostOnCooldown && !stunned)
             StartCoroutine(Boost());
